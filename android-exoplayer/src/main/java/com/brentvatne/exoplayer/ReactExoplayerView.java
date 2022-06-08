@@ -947,7 +947,8 @@ class ReactExoplayerView extends FrameLayout implements
                 // Special case for decoder initialization failures.
                 MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
                         (MediaCodecRenderer.DecoderInitializationException) cause;
-                if (decoderInitializationException.codecInfo.name == null) {
+                if (decoderInitializationException.codecInfo == null
+                        || decoderInitializationException.codecInfo.name == null) {
                     if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
                         errorString = getResources().getString(R.string.error_querying_decoders);
                     } else if (decoderInitializationException.secureDecoderRequired) {
@@ -1155,7 +1156,7 @@ class ReactExoplayerView extends FrameLayout implements
                     }
                 }
             }
-        } else if (rendererIndex == C.TRACK_TYPE_TEXT && Util.SDK_INT > 18) { // Text default
+        } else if (trackType == C.TRACK_TYPE_TEXT && Util.SDK_INT > 18) { // Text default
             // Use system settings if possible
             CaptioningManager captioningManager
                     = (CaptioningManager)themedReactContext.getSystemService(Context.CAPTIONING_SERVICE);
@@ -1240,12 +1241,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setMutedModifier(boolean muted) {
         this.muted = muted;
-        audioVolume = muted ? 0.f : 1.f;
         if (player != null) {
-            player.setVolume(audioVolume);
+            player.setVolume(muted ? 0.f : audioVolume);
         }
     }
-
 
     public void setVolumeModifier(float volume) {
         audioVolume = volume;
